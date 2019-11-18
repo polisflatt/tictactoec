@@ -11,8 +11,8 @@
 /* It is due to the fact that diameters are not measurable on non-squares */
 
 /* It may be considered redundant, but the variation is here for readability reasons */
-#define dimension_x 2
-#define dimension_y 2
+#define dimension_x 3
+#define dimension_y 3
 
 /* Error codes */
 

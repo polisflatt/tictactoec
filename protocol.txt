@@ -1,0 +1,13 @@
+The protocol used for online play in this game is a very simple, primitive, and non-bloated one. It is not JSON, but it is pure text, with simple delimiters. 
+
+On connection, the host and peer will exchange usernames. Next, they will exchange the dimensions of their board (in format of "DIM_X/DIM_Y"). The host will send the first message, whereas the peer will be waiting for the host. 
+
+Now, throughout the game, they will exchange coordinates in the format described above, which would encode their moves, respectively. If we want to "visualize" this:
+
+->USERNAME
+->DIM_X/DIM_Y
+
+->COORD_X/COORD_Y
+
+Additionally, if a user wants to send a message to his opponent, the protocol for doing that is "@[message]".
+

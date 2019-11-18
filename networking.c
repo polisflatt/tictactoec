@@ -22,7 +22,7 @@ extern int errno;
 
 /* TACTOE PROTOCOL, No bloated JSON! */
 /* USERNAME */ /* of your opponent */
-/* DIMENSION */ /* Of the board */
+/* DIMENSION_X/DIMENSION_Y */ /* Of the board */
 /* X-CORD/Y-CORD*/ /* To place */
 /* @ message */
 
@@ -165,19 +165,47 @@ void host_game(const int port, const char* username)
     printf("\nConnection accepted from %s!\n", ip);
     printf("You are O! - because you are host.\n");
 
+    /* Send username over */
     send(new_socket, username, sizeof(username), 0);
     char rival_username[256];
+    int r_dimension_x;
+    int r_dimension_y;
 
     /* Wait */
     printf("Obtaining username...");
     pthread_create(&wait_thread, NULL, wait_function, NULL);
 
-    while (!recv(new_socket, rival_username, sizeof buffer, 0))
-    {
-        //printf("Obtaining username...");
-    }
+    /* Wait until we get the username back */
+    while (!recv(new_socket, rival_username, sizeof buffer, 0));
+
     pthread_cancel(wait_thread);
     printf("\nYou are matched with %s\n", rival_username);
+
+    /* Cook and prepare the dimensions we have */
+    printf("Obtaining dimensions...\nChecking for incompatibilities...\n");
+    char dim_buffer[256];
+    sprintf(dim_buffer, "%d/%d", dimension_x, dimension_y);
+    send(new_socket, dim_buffer, sizeof(dim_buffer), 0);
+
+    /* We are running out of variable names... */
+    char _dim_buffer[256];
+
+    /* Again, wait */
+    while (!recv(new_socket, _dim_buffer, sizeof(_dim_buffer), 0));
+    
+
+    int* _array = coordinates(_dim_buffer); /* The coordinates function works for this too, conveniently */
+    r_dimension_y = _array[1];
+    r_dimension_x = _array[0];
+
+    if (r_dimension_x != dimension_x || r_dimension_y != dimension_y)
+    {
+        send(new_socket, (const char*) INCOMPATIBLE_GEOMETRY, sizeof(INCOMPATIBLE_GEOMETRY), 0);
+        printf(MSG_INCOMPATIBLE_GEOMETRY, r_dimension_x, r_dimension_y, dimension_x, dimension_y);
+        exit(EXIT_FAILURE);
+    }
+
+    printf("Connected with a %dx%d grid!\n", dimension_x, dimension_y);
 
     for (int i = 0; i < 100; i++) /* We give one-hundred turns, because no tic-tac-toe game would continue past that -- or get even close */
     {
@@ -293,6 +321,7 @@ void host_game(const int port, const char* username)
 
             /* Place the letter on the board - on client side!*/
             place(board, turn, x, y);
+            clear();
             break;
         }
     }
@@ -334,19 +363,45 @@ int join_game(const char* ip_address, const int port, const char* username)
     printf("\nConnection success! You are X because you are not a host. Hosts go first. Please wait!\n");
 
     char rival_username[256];
+    int rival_x_dimension;
+    int rival_y_dimension;
 
-    pthread_t wait_thread;
     printf("Obtaining username...");
-    pthread_create(&wait_thread, NULL, wait_function, NULL);
     
-    while (!recv(sockfd, rival_username, sizeof(rival_username), 0))
-    {
+    /* Warte */
+    while (!recv(sockfd, rival_username, sizeof(rival_username), 0));
 
-    }
-    pthread_cancel(wait_thread);
     printf("\nYou are matched with %s\n", rival_username);
 
     send(sockfd, username, sizeof(username), 0);
+
+    printf("Obtaining dimensions...\nChecking for incompatibilities...\n");
+
+
+
+    /* We are running out of variable names... */
+    char _dim_buffer[256];
+
+    /* Again, wait */
+    while (!recv(sockfd, _dim_buffer, sizeof(_dim_buffer), 0));
+
+    int* _array = coordinates(_dim_buffer);
+    /* The coordinates function works for this too, conveniently */
+    rival_x_dimension = _array[0];
+    rival_y_dimension = _array[1];
+
+    char dim_buffer[256];
+    sprintf(dim_buffer, "%d/%d", dimension_x, dimension_y);
+    send(sockfd, dim_buffer, sizeof(dim_buffer), 0);
+
+    if (rival_x_dimension != dimension_x || rival_y_dimension != dimension_y)
+    {
+        send(sockfd, INCOMPATIBLE_GEOMETRY, sizeof(INCOMPATIBLE_GEOMETRY), 0);
+        printf(MSG_INCOMPATIBLE_GEOMETRY);
+        exit(EXIT_FAILURE);
+    }
+
+    printf("Connected with a %dx%d grid!\n", dimension_x, dimension_y);
 
     for (int i = 0; i < 100; i++) /* We give one-hundred turns, because no tic-tac-toe game would continue past that -- or get even close */
     {
@@ -375,8 +430,9 @@ int join_game(const char* ip_address, const int port, const char* username)
                 char buffer[256];
 
                 printf("\nWait...");
-                pthread_t wait_thread;
-                pthread_create(&wait_thread, NULL, wait_function, NULL);
+                // Thread is acting up
+                //pthread_t wait_thread;
+                //pthread_create(&wait_thread, NULL, wait_function, NULL);
 
                 int j = 0;
                 while (!recv(sockfd, buffer, sizeof(buffer), 0))
@@ -387,7 +443,7 @@ int join_game(const char* ip_address, const int port, const char* username)
                         exit(1);
                     }
                 }
-                pthread_cancel(wait_thread);
+                //pthread_cancel(&wait_thread);
 
                 if (buffer[0] == '@')
                 {

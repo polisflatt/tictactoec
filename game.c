@@ -55,12 +55,13 @@ int array_won_check(char search, int board[][dimension_x])
             if (board[i][j] != search)
             {
                 won = 0;
+                break;
             }
             else if (board[i][j] == search)
             {
                 if (j == (dimension_x - 1) && won == 1) /* Counting from zero and then from one is confusing. */
                 {
-                    printf("ACROSS\n");
+                    printf("\nACROSS\n");
                     return 1; 
                 }
                 else
@@ -108,7 +109,7 @@ int array_won_check(char search, int board[][dimension_x])
 
         if (won)
         {
-            printf("DOWN\n");
+            printf("\nSTRAIGHT DOWN\n");
             return won;
         }
     }
@@ -127,7 +128,7 @@ int array_won_check(char search, int board[][dimension_x])
         
         if (i == (dimension_y - 1) && board[i][i] == search && _won == 1)
         {
-            printf("DIAGONAL\n");
+            printf("\nDIAGONAL\n");
             return 1;
         }
     }
@@ -148,7 +149,7 @@ int array_won_check(char search, int board[][dimension_x])
 
         if (i == 0 && board[i][_y] == search &&_won == 1) /* At the end of the diagonal */
         { /* Actual some mathematics and logical thinking for coding a simple game like tic-tac-toe */
-            printf("reverse diagonal\n");
+            printf("\nREVERSE DIAGONAL\n");
             return 1;
         }
 
@@ -174,7 +175,7 @@ int who_won(int board[][dimension_x])
     {
         if (array_won_check(player[i], board))
         {
-            //printf("%s won the game.\n", player[i]);
+            printf("%c won the game.\n", player[i]);
             return 1;
 
         }

@@ -11,8 +11,8 @@
 /* It is due to the fact that diameters are not measurable on non-squares */
 
 /* It may be considered redundant, but the variation is here for readability reasons */
-#define dimension_x 2
-#define dimension_y 2
+#define dimension_x 3
+#define dimension_y 3
 
 /* Error codes */
 
@@ -22,6 +22,7 @@ char* WENT_TWICE      =   "1001";
 char* WENT_INPLACE    =   "1002";
 char* CHEATED         =   "1003";
 char* LAG             =   "2000";
+char* INCOMPATIBLE_GEOMETRY     = "3000";
 
 /* Okay, I really need integer versions, for switches */
 const int I_INVALID_MOVE  =   1000;
@@ -29,12 +30,14 @@ const int I_WENT_TWICE      =   1001;
 const int I_WENT_INPLACE    =   1002;
 const int I_CHEATED         =   1003;
 const int I_LAG             =   2000;
+const int I_INCOMPATIBLE_GEOMETRY     = 3000;
 
 char* MSG_INVALID_MOVE      =   "The opponent made an invalid move which violates the rules of the game. Unspecific\n";
 char* MSG_WENT_TWICE        =   "The opponent went twice, which is illegal.\n";
 char* MSG_WENT_INPLACE      =   "The opponent went in place of another letter, which is illegal.\n";
 char* MSG_LAG               =   "The opponent had lag to the degree of unplayability (which, for this type of game, is almost an impossibility).\n";
 char* MSG_CHEATED           =   "The opponent, for an unknown reason, has been detected cheating.\n";
+char* MSG_INCOMPATIBLE_GEOMETRY     =   "The opponent has differing geometry (y, x) from you. They have %dx%d and you have %dx%d. Check misc.c and recompile?\n";
 
 /* Do you want cheat protection? */
 int cheat_protection = 1;
